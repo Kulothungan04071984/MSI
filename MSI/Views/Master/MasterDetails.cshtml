@@ -1,0 +1,107 @@
+﻿@model MSI.Models.UploadFileDetails
+@{
+    ViewData["Title"] = "MasterDetails";
+}
+
+@* <p>@ViewBag.DomainSid</p> *@
+
+<form asp-action="MasterDetails" method="post" enctype="multipart/form-data">
+<div class="container">
+    <section>
+        @if(Model != null)
+        {
+        <div class="card">
+            <div class="card-title">
+                
+                <div class="card-body">
+                    <div class="card-header">
+                            <span>File Mapping</span>
+                    </div>
+           
+        <div class="row">
+            <div class="col-lg-6" style="padding:1.6%;">
+              @*   System Name :
+                @Html.DropDownList("Systemid", new SelectList(ViewBag.computerName, "Systemid", "SystemName")) *@
+               <div style="padding:2%;">System Name</div>
+             @*    <select class="form-control" ">
+                @foreach (var item in ViewBag.computerName)
+                {
+                   <option> @item</option>
+                }
+                </select> *@
+                    <div>
+                    @Html.DropDownListFor(model => model.systemid, Model.lstSystem, "Select an SystemName", new { @class = "form-control" })
+                    </div>
+            </div>
+                            <div class="col-lg-6" style="padding:1.8%;">
+                    <div style="padding:1%">
+                        <span>File Upload</span>
+                    </div>
+                    <div style="padding:1%">
+                    <input type="file" class="form-control" id="file" name="file" accept="video/*">
+                    </div>
+                    <div style="padding:1%;text-align:end;">
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                    </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-2">
+                    @ViewBag.Message
+            </div>
+            <div class="col-lg-10">
+                    @ViewBag.ThumbnailPath
+            </div>
+            
+        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="tab-content">
+                    <table class="table table-responsive d-table-row">
+                        <thead>
+                            <tr>
+                            <th>
+                                System ID
+                            </th>
+                            <th>
+                                System Name
+                            </th>
+                            <th>
+                                File Path
+                            </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if(Model != null)
+                            {
+                                @if(Model.lstFileMappings != null)
+                                {
+
+                              
+                            @foreach (var item in Model.lstFileMappings)
+                            {
+                                <tr>
+                                    <td>
+                                        @item.systemid
+                                    </td>
+                                    <td>
+                                        @item.systemname
+                                    </td>
+                                    <td>
+                                        @item.filepath
+                                    </td>
+                                </tr>
+                            }
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            }
+    </section>
+
+</div>
+</form>

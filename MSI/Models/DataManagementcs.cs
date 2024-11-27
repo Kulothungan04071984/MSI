@@ -216,5 +216,30 @@ namespace MSI.Models
             // Return null if no file path was found or an error occurred
             return null;
         }
+
+        public int deleteFileMapping(int fileMappingId)
+        {
+            int resultDelete = 0;
+            try
+            {
+                using (SqlConnection con = new SqlConnection(ConnectionString))
+                {
+                    using (SqlCommand command = new SqlCommand("pro_deleteFileMapping", con))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@systemid", fileMappingId);
+                        con.Open();
+                        resultDelete = command.ExecuteNonQuery();
+                        con.Close();
+                    }
+                }
+                return resultDelete;
+
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
     }
 }

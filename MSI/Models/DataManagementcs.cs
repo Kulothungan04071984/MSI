@@ -172,5 +172,30 @@ namespace MSI.Models
                 return lstFileMapping;
             }
         }
+
+        public int deleteFileMapping(int fileMappingId)
+        {
+            int resultDelete = 0;
+            try
+            {
+                using (SqlConnection con = new SqlConnection(ConnectionString))
+                {
+                    using (SqlCommand command = new SqlCommand("pro_deleteFileMapping", con))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@systemid", fileMappingId);
+                        con.Open();
+                        resultDelete = command.ExecuteNonQuery();
+                        con.Close();
+                    }
+                }
+                return resultDelete;
+
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
     }
 }

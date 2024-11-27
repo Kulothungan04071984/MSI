@@ -24,7 +24,7 @@ namespace MSI.Controllers
 			ViewBag.DomainSid = domainSid;
             //ViewBag.computerName = systemName;
             uploadFileDetails.lstSystem = _domainServices.getSystemNames();
-
+            uploadFileDetails.lstFileMappings = _domainServices.getFileMappingDetails();
             return View(uploadFileDetails);
 		}
 
@@ -100,6 +100,21 @@ namespace MSI.Controllers
                 var options = new MediaToolkit.Options.ConversionOptions { Seek = TimeSpan.FromSeconds(1) };
                 engine.GetThumbnail(inputFile, outputFile, options);
             }
+        }
+        [HttpPost]
+        public JsonResult deleteFileMapping(int systemid)
+        {
+            int resultdel = 0;
+            try
+            {
+                 resultdel = _domainServices.deleteFileMapping(systemid);
+            }
+             
+            catch(Exception ex)
+            {
+                resultdel = 0;
+            }
+            return Json(resultdel);
         }
 
       

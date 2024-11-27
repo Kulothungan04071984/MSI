@@ -53,7 +53,7 @@ namespace MSI.Controllers
                         var uploadDetails = new UploadFileDetails();
                         uploadDetails.systemid = string.IsNullOrEmpty(uploadFileDetails.systemid.ToString()) ? 0 : uploadFileDetails.systemid;
                         uploadDetails.filepath = filePath;
-                        uploadDetails.uploaddatetime = DateTime.Today.ToString();
+                        uploadDetails.uploaddatetime = (DateTime.Now).ToString();
                         uploadDetails.uploadEmployee = "70192";
                         //uploadFileDetails.systemname = uploadFileDetails.lstSystem.Where(a => a.Value == uploadFileDetails.systemid.ToString()).Select(a => a.Text.ToString()).FirstOrDefault();
                         //uploadFileDetails.systemname = "";

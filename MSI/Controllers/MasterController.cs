@@ -8,7 +8,7 @@ namespace MSI.Controllers
 	public class MasterController : Controller
 	{
 		private DataManagementcs _domainServices;
-      
+        private readonly long _fileSizeLimit = 10L * 1024L * 1024L * 1024L;
         // private readonly IWebHostEnvironment _webHostEnvironment;, IWebHostEnvironment webHostEnvironment
         public MasterController(DataManagementcs domainServices)
         {
@@ -31,52 +31,62 @@ namespace MSI.Controllers
         [HttpPost]
         public async Task<IActionResult> MasterDetails(IFormFile file,UploadFileDetails uploadFileDetails)
         {
+
             int result = 0;
             UploadFileDetails objupload =new UploadFileDetails();
             try
             {
                 if (file != null && file.Length > 0)
                 {
-                    var path = "\\\\192.168.1.188\\MSI_Videos";
-                    //var uploadVideoFile = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
-                    var uploadVideoFile = Path.Combine(path, "uploads");
-                    if (Directory.Exists(path))
+                    if (file.Length > _fileSizeLimit)
                     {
-                        //Directory.CreateDirectory(uploadVideoFile);
-                        var filePath = Path.Combine(uploadVideoFile, file.FileName);
-                        using (var filestream = new FileStream(filePath, FileMode.Create))
+                        ViewBag.Message = "File size exceeds the limit.";
+                        ViewBag.ThumbnailPath = "";
+                    }
+                    else
+                    {
+                        var path = "\\\\192.168.1.188\\MSI_Videos";
+                        //var uploadVideoFile = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+                        var uploadVideoFile = Path.Combine(path, "uploads");
+                        if (Directory.Exists(path))
                         {
-                            await file.CopyToAsync(filestream);
+                            //Directory.CreateDirectory(uploadVideoFile);
+                            var filePath = Path.Combine(uploadVideoFile, file.FileName);
+                            using (var filestream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await file.CopyToAsync(filestream);
+                            }
+                            var thumbnailPath = Path.Combine(uploadVideoFile, $"{Path.GetFileNameWithoutExtension(file.FileName)}.jpg");
+                            ExtractThumbnail(filePath, thumbnailPath);
+                            var uploadDetails = new UploadFileDetails();
+                            uploadDetails.systemid = string.IsNullOrEmpty(uploadFileDetails.systemid.ToString()) ? 0 : uploadFileDetails.systemid;
+                            uploadDetails.filepath = filePath;
+                            uploadDetails.uploaddatetime = DateTime.Today.ToString();
+                            uploadDetails.uploadEmployee = "70192";
+                            //uploadFileDetails.systemname = uploadFileDetails.lstSystem.Where(a => a.Value == uploadFileDetails.systemid.ToString()).Select(a => a.Text.ToString()).FirstOrDefault();
+                            //uploadFileDetails.systemname = "";
+                            result = _domainServices.uploaddatainserted(uploadDetails);
+                            if (result > 0)
+                            {
+                                ViewBag.Message = "Video uploaded successfully";
+                                ViewBag.ThumbnailPath = $"/uploads/{Path.GetFileName(thumbnailPath)}";
+                                uploadFileDetails.lstSystem = _domainServices.getSystemNames();
+                                uploadFileDetails.lstFileMappings = _domainServices.getFileMappingDetails();
+                                objupload = uploadFileDetails;
+                            }
+                            else
+                            {
+                                ViewBag.Message = "Video Not uploaded ";
+                                ViewBag.ThumbnailPath = "";
+                            }
+
                         }
-                        var thumbnailPath = Path.Combine(uploadVideoFile, $"{Path.GetFileNameWithoutExtension(file.FileName)}.jpg");
-                        ExtractThumbnail(filePath, thumbnailPath);
-                        var uploadDetails = new UploadFileDetails();
-                        uploadDetails.systemid = string.IsNullOrEmpty(uploadFileDetails.systemid.ToString()) ? 0 : uploadFileDetails.systemid;
-                        uploadDetails.filepath = filePath;
-                        uploadDetails.uploaddatetime = DateTime.Today.ToString();
-                        uploadDetails.uploadEmployee = "70192";
-                        //uploadFileDetails.systemname = uploadFileDetails.lstSystem.Where(a => a.Value == uploadFileDetails.systemid.ToString()).Select(a => a.Text.ToString()).FirstOrDefault();
-                        //uploadFileDetails.systemname = "";
-                        result = _domainServices.uploaddatainserted(uploadDetails);
-                        if (result > 0) {
-                            ViewBag.Message = "Video uploaded successfully";
-                            ViewBag.ThumbnailPath = $"/uploads/{Path.GetFileName(thumbnailPath)}";
-                            uploadFileDetails.lstSystem = _domainServices.getSystemNames();
-                            uploadFileDetails.lstFileMappings = _domainServices.getFileMappingDetails();
-                            objupload = uploadFileDetails;
-                        }
-                        else
-                        {
-                            ViewBag.Message = "Video Not uploaded ";
-                            ViewBag.ThumbnailPath = "";
-                        }
-                      
                     }
 
                 }
                 else
                 {
-                    ViewBag.Message = "Please Give Proper Input";
+                    ViewBag.Message = "Please Give Proper Input";                
                 }
 
                 return View(objupload);

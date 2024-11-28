@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.Features;
 using Xabe.FFmpeg;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +7,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 FFmpeg.SetExecutablesPath(Path.Combine(Directory.GetCurrentDirectory(), "ffmpeg"));
 builder.Services.AddScoped<MSI.Models.DataManagementcs>();
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 10L * 1024L * 1024L * 1024L; // 10 GB, adjust as necessary
+});
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 10L * 1024L * 1024L * 1024L; // 10 GB, adjust as necessary
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

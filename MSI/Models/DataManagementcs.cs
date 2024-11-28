@@ -173,6 +173,50 @@ namespace MSI.Models
             }
         }
 
+        public string getfilepath(string device_name)
+        {
+            DataTable dt = new DataTable();
+            try
+            {
+                // Open a new SQL connection
+                using (SqlConnection conn = new SqlConnection(ConnectionString))
+                {
+                    // Create the SQL command object for the stored procedure
+                    using (SqlCommand cmd = new SqlCommand("pro_getfilepath", conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        // Add parameters for the stored procedure
+                        cmd.Parameters.AddWithValue("@device_name", device_name);
+
+                        // Use SqlDataAdapter to fill the DataTable
+                        SqlDataAdapter da = new SqlDataAdapter(cmd);
+                        da.Fill(dt);
+                    }
+                }
+
+                // Check if the DataTable has rows and extract the file path
+                if (dt.Rows.Count > 0)
+                {
+                    // Assuming 'File_Path' is the name of the column in your SQL result set
+                    string filePath = dt.Rows[0]["File_Path"].ToString();
+                    if (!string.IsNullOrEmpty(filePath))
+                    {
+                        return filePath;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (you might want to log this somewhere, e.g., in a log file)
+                Console.WriteLine("Error fetching file path: " + ex.Message);
+                // You can also use a logger instead of Console.WriteLine in production
+            }
+
+            // Return null if no file path was found or an error occurred
+            return null;
+        }
+
         public int deleteFileMapping(int fileMappingId)
         {
             int resultDelete = 0;

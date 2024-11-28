@@ -10,31 +10,29 @@ namespace MSI.Controllers
     {
         private DataManagementcs _domainServices;
 
-        // private readonly IWebHostEnvironment _webHostEnvironment;, IWebHostEnvironment webHostEnvironment
         public PlayVideoController(DataManagementcs domainServices)
         {
             _domainServices = domainServices;
-            //_webHostEnvironment = webHostEnvironment;
-            // _iinsertDetails = iinsertDetails;
-        }
-        public IActionResult Privacy()
-        {
-            string fileName = "sys1.pdf";  // Hard-code the file name for PDF
-            string filePath = Path.Combine(@"\\192.168.1.181\sap_xmls\MSI_WO_Display\SYSTEM1\", fileName);
 
-            // Check if the file exists
-            if (System.IO.File.Exists(filePath))
-            {
-                // Open the file as a stream for better memory management
-                var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-                return File(fileStream, "application/pdf");
-            }
-            else
-            {
-                // Return 404 if the file is not found
-                return NotFound($"The file {fileName} was not found.");
-            }
         }
+        //public IActionResult Privacy()
+        //{
+        //    string fileName = "sys1.pdf";  // Hard-code the file name for PDF
+        //    string filePath = Path.Combine(@"\\192.168.1.181\sap_xmls\MSI_WO_Display\SYSTEM1\", fileName);
+
+        //    // Check if the file exists
+        //    if (System.IO.File.Exists(filePath))
+        //    {
+        //        // Open the file as a stream for better memory management
+        //        var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+        //        return File(fileStream, "application/pdf");
+        //    }
+        //    else
+        //    {
+        //        // Return 404 if the file is not found
+        //        return NotFound($"The file {fileName} was not found.");
+        //    }
+        //}
 
         public IActionResult VideoPlaying()
         {
@@ -44,16 +42,10 @@ namespace MSI.Controllers
 
             // Fetch file path using DataAccess
             string filePath1 = _domainServices.getfilepath(deviceName);
-            //string filePath = $@"{filePath1}";
-            string filePath = @"\\192.168.1.181\sap_xmls\MSI_WO_Display\SYSTEM1\q.pdf";
+            string filePath = $@"{filePath1}";
 
+            // ------------Code for displaying video file 
 
-
-            // Hard-code the MP4 file name (could be dynamic based on some logic)
-            //string filePath1 = Path.Combine(@"\\192.168.1.181\sap_xmls\MSI_WO_Display\SYSTEM1\", fileName);
-
-
-            // Check if the file exists
             if (string.IsNullOrEmpty(filePath) || !System.IO.File.Exists(filePath))
             {
                 // Set a flag or a message to indicate that the file was not found
@@ -61,26 +53,29 @@ namespace MSI.Controllers
                 return View();  // Return the view indicating the file is not found
             }
             else
+            {
+                var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+                // Explicitly set the Content-Type for the response
+                Response.Headers.Add("Content-Type", "video/mp4");
+                return File(fileStream, "video/mp4");  // Return the MP4 file as a response
+            }
+
+
+            //------------- Code for displaying pdf file 
+
+            //if (string.IsNullOrEmpty(filePath) || !System.IO.File.Exists(filePath))
             //{
-            //    var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-            //    // Explicitly set the Content-Type for the response
-            //    Response.Headers.Add("Content-Type", "video/mp4");
-            //    return File(fileStream, "video/mp4");  // Return the MP4 file as a response
+            //    // Set a flag or a message to indicate that the file was not found
+            //    ViewBag.FileNotFound = true;
+            //    return View();  // Return the view indicating the file is not found
             //}
 
-            if (string.IsNullOrEmpty(filePath) || !System.IO.File.Exists(filePath))
-            {
-                // Set a flag or a message to indicate that the file was not found
-                ViewBag.FileNotFound = true;
-                return View();  // Return the view indicating the file is not found
-            }
-
-            else
-            {
-                // Open the file as a stream for better memory management
-                var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-                return File(fileStream, "application/pdf");
-            }
+            //else
+            //{
+            //    // Open the file as a stream for better memory management
+            //    var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            //    return File(fileStream, "application/pdf");
+            //}
             
 
         }

@@ -37,8 +37,8 @@ namespace MSI.Controllers
         public IActionResult VideoPlaying()
         {
             // Get the device name (machine name)
-            //string deviceName = Process_systemname();
-            string deviceName = "STPLPC903";
+            string deviceName = Process_systemname();
+           // string deviceName = "STPLPC903";
 
             // Fetch file path using DataAccess
             string filePath1 = _domainServices.getfilepath(deviceName);
